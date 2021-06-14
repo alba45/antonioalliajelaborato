@@ -37,7 +37,7 @@ if (isset($_SESSION['id']) === true) {
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <!-- Title  -->
-    <title>AliMel.it | order to do</title>
+    <title>AliMel.it | assign work</title>
 
     <!-- Favicon  -->
     <link rel="icon" href="../../img/core-img/favicon.ico">
@@ -90,117 +90,91 @@ if (isset($_SESSION['id']) === true) {
                 <ul>
                     <li><a href="homeadmin.php">home</a></li>
                     <li><a href="assignwork.php">assign work</a></li>
-                    <li><a href="jobdonebyworkers.php">job done by</br></br>workers</a></li>
+                    <li><a href="jobdonebyworkers.php">orders done by</br></br>workers</a></li>
                     <li><a href="ordersdone.php">orders done</a></li>
-                    <li class="active"><a href="orderstodo.php">orders to do</a></li>
                 </ul>
             </nav>
         </header>
+
         <!-- Header Area End -->
         <!-- Product Catagories Area Start -->
         <div class="products-catagories-area clearfix">
-            <div class="amado-pro-catagory clearfix">
 
             <div class="cart-title">
-                                <h2>Search jobs done by the username</h2>
-                                <h5>Insert the the username of the employer to see his job done</h5>
-                            </div>
-
-                            <form method="POST" action="jobofaworker.php">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <?php
-
-                                        $username = $_POST['username'] ?? '';
-                                        echo "<input type='text' class='form-control' id='username' name='username' placeholder='Name' value='$username' required>";
-
-                                        ?>
-                                        <button type="submit" class="btn amado-btn mb-15" name="assign orders">Search orders</button>
-                                    </div>
-                                </div>
-                            </form>
-
-                            <?php
-
-                            $category = array('', 'base', 'compound', 'fragile', 'heavy', 'extraordinary');
-                            $date = date('Y/m/d');
-                            $codO = array();
-                            $i = 0;
-
-                            $mysqli = new mysqli('localhost', 'root', '', 'ou_alimel');
-
-                            if ($mysqli->connect_error) {
-                                die('Errore di connessione(' . $mysqli->connect_errno . ')' . $mysqli->connect_error);
-                            }
-
-
-                            try {
-                                $tab = $mysqli->query("SELECT orders.codO,n_articles, codC
-                    FROM orders
-                    WHERE orders.usernameP = '$username'
-                    AND orders.date_order = '$date'
-                    AND orders.usernameP IS NOT NULL
-                    AND orders.codWS IS NOT NULL");
-                            } catch (exception $e) {
-                                echo $e->getMessage() + "<br/>
-                         something went wrong GO BACK <--";
-                            } finally {
-
-                                echo "<div><h2>ORDERS DONE TODAY BY: $username</h2></div>
-                        <table class='customers'>
-                        <tr>
-                        <th>codO</th>
-                        <th>articles</th>
-                        <th>category</th>
-                        </tr>";
-                                while ($riga = $tab->fetch_array(MYSQLI_ASSOC)) {
-                                    echo "<tr>
-                            <td>" . $riga['codO'] . "</td>                        
-                            <td>" . $riga['n_articles'] . "</td>                        
-                            <td>" . $category[$riga['codC']] . "</td>
-                            </tr>";
-                                }
-                                echo "</table></br>";
-                            }
-
-                            // -------------------------------------------------END ORDERS AVAILABLE OF TODAY------------------------------------------------------------//
-
-
-                            try {
-                                $tab = $mysqli->query("SELECT orders.codO,n_articles, codC
-                    FROM orders
-                    WHERE orders.usernameP = '$username'
-                    AND orders.usernameP IS NOT NULL
-                    AND orders.codWS IS NOT NULL");
-                            } catch (exception $e) {
-                                echo $e->getMessage() + "<br/>
-                         something went wrong GO BACK <--";
-                            } finally {
-
-                                echo "<div><h2>ALL ORDERS DONE BY: $username</h2></div>
-                        <table class='customers'>
-                        <tr>
-                        <th>codO</th>
-                        <th>articles</th>
-                        <th>category</th>
-                        </tr>";
-                                while ($riga = $tab->fetch_array(MYSQLI_ASSOC)) {
-                                    echo "<tr>
-                            <td>" . $riga['codO'] . "</td>                        
-                            <td>" . $riga['n_articles'] . "</td>                        
-                            <td>" . $category[$riga['codC']] . "</td>
-                            </tr>";
-                                }
-                                echo "</table></br>";
-                            }
-
-                            // -------------------------------------------------END ORDERS AVAILABLE OF TODAY------------------------------------------------------------//
-
-                    ?>
-                </form>
-                </br></br></br>
-
+                <h2>Search jobs done by the username</h2>
+                <h5>Insert the the username of the employer to see his orders done</h5>
             </div>
+
+            <form method="POST" action="jobofaworker.php">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <?php
+
+                        $username = $_POST['username'] ?? '';
+                        echo "<input type='text' class='form-control' id='username' name='username' placeholder='Name' value='$username' required>";
+
+                        ?>
+                        <button type="submit" class="btn amado-btn mb-15" name="assign orders">Search orders</button>
+                    </div>
+                </div>
+            </form>
+
+            <?php
+
+            $category = array('', 'base', 'compound', 'fragile', 'heavy', 'extraordinary');
+            $date = date('Y/m/d');
+            $codO = array();
+            $i = 0;
+
+            $mysqli = new mysqli('localhost', 'root', '', 'ou_alimel');
+
+            if ($mysqli->connect_error) {
+                die('Errore di connessione(' . $mysqli->connect_errno . ')' . $mysqli->connect_error);
+            }
+
+            try {
+                $tab = $mysqli->query("SELECT orders.codO,n_articles, codC, codWS
+                    FROM orders
+                    WHERE orders.usernameP = '$username'
+                    AND orders.usernameP IS NOT NULL
+                    AND orders.codWS IS NOT NULL");
+            } catch (exception $e) {
+                echo $e->getMessage() + "<br/>
+                         something went wrong GO BACK <--";
+            } finally {
+
+                echo "<div><h2>ALL ORDERS DONE BY: $username</h2></div>
+                        <table class='customers'>
+                        <tr>
+                        <th>codO</th>
+                        <th>articles</th>
+                        <th>category</th>
+                        <th>category</th>
+                        </tr>";
+                while ($riga = $tab->fetch_array(MYSQLI_ASSOC)) {
+                    echo "<tr>
+                            <td>" . $riga['codO'] . "</td>                        
+                            <td>" . $riga['n_articles'] . "</td>                        
+                            <td>" . $category[$riga['codC']] . "</td>
+                            <td>" . $riga['codWS'] . "</td>
+                            </tr>";
+                }
+                echo "</table></br>";
+                $tab = $mysqli->query("SELECT COUNT(orders.codO) AS conteggio
+                    FROM orders
+                    WHERE orders.usernameP = '$username'
+                    AND orders.usernameP IS NOT NULL
+                    AND orders.codWS IS NOT NULL");
+                $riga = $tab->fetch_array(MYSQLI_ASSOC);
+                echo "<h4>Ordini totali fatti : " . $riga['conteggio'] . "</h4></br></br>";
+            }
+
+            // -------------------------------------------------END ORDERS AVAILABLE OF TODAY------------------------------------------------------------//
+
+            ?>
+            </form>
+            </br></br></br>
+
         </div>
         <!-- Product Catagories Area End -->
     </div>
@@ -219,6 +193,7 @@ if (isset($_SESSION['id']) === true) {
             </div>
         </div>
     </section>
+
     <!-- ##### Newsletter Area End ##### -->
 
     <!-- ##### Footer Area Start ##### -->
@@ -253,20 +228,17 @@ if (isset($_SESSION['id']) === true) {
                                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#footerNavContent" aria-controls="footerNavContent" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i></button>
                                 <div class="collapse navbar-collapse" id="footerNavContent">
                                     <ul class="navbar-nav ml-auto">
-                                        <li class="nav-item active">
+                                        <li class="nav-item">
                                             <a class="nav-link" href="homeadmin.php">Home</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" href="assignwork.php">assign work</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" href="jobdonebyworkers.php">job done by workers</a>
+                                            <a class="nav-link" href="jobdonebyworkers.php">orders done by workers</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" href="ordersdone.php">orders done</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="orderstodo.php">orders to do</a>
                                         </li>
                                     </ul>
                                 </div>

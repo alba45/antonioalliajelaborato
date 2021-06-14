@@ -19,11 +19,10 @@ if (isset($_SESSION['id']) === true) {
     $usernamecheck = $check->fetchAll(PDO::FETCH_ASSOC);
 
     if (count($usernamecheck) > 0) {
-    }else{
+    } else {
         header("Location: ../../index.html");
     }
-
-}else{
+} else {
     header("Location: ../../index.html");
 }
 ?>
@@ -45,7 +44,7 @@ if (isset($_SESSION['id']) === true) {
 
     <!-- Core Style CSS -->
     <link rel="stylesheet" href="../../css/core-style.css">
-  <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/style.css">
 </head>
 
 <body>
@@ -89,9 +88,8 @@ if (isset($_SESSION['id']) === true) {
                 <ul>
                     <li class="active"><a href="homeadmin.php">home</a></li>
                     <li><a href="assignwork.php">assign work</a></li>
-                    <li><a href="jobdonebyworkers.php">job done by</br></br>workers</a></li>
+                    <li><a href="jobdonebyworkers.php">orders done by</br></br>workers</a></li>
                     <li><a href="ordersdone.php">orders done</a></li>
-                    <li><a href="orderstodo.php">orders to do</a></li>
                 </ul>
             </nav>
         </header>
@@ -152,15 +150,15 @@ if (isset($_SESSION['id']) === true) {
                     </a>
                 </div>
 
-               <!-- Single Catagory -->
-               <div class="single-products-catagory clearfix">
-                    <a href="#">
-                        <img src="../../img/bg-img/10.jpg" alt="">
+                <!-- Single Catagory -->
+                <div class="single-products-catagory clearfix">
+                    <a href="orderstodo.php">
+                        <img src="../../img/bg-img/4.jpg" alt="">
                         <!-- Hover Content -->
                         <div class="hover-content">
                             <div class="line"></div>
-                            <p>soon available</p>
-                            <h4>NOT AVAILABLE YET</h4>
+                            <p>see the orders </p>
+                            <h4>ORDERS TO DO</h4>
                         </div>
                     </a>
                 </div>
@@ -238,7 +236,7 @@ if (isset($_SESSION['id']) === true) {
                                             <a class="nav-link" href="assignwork.php">assign work</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" href="jobdonebyworkers.php">job done by workers</a>
+                                            <a class="nav-link" href="jobdonebyworkers.php">orders done by workers</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" href="ordersdone.php">orders done</a>

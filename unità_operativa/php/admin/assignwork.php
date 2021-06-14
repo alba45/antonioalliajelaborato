@@ -19,11 +19,10 @@ if (isset($_SESSION['id']) === true) {
     $usernamecheck = $check->fetchAll(PDO::FETCH_ASSOC);
 
     if (count($usernamecheck) > 0) {
-    }else{
+    } else {
         header("Location: ../../index.html");
     }
-
-}else{
+} else {
     header("Location: ../../index.html");
 }
 ?>
@@ -38,7 +37,7 @@ if (isset($_SESSION['id']) === true) {
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <!-- Title  -->
-    <title>AliMel.it | assign work</title>
+    <title>AliMel.it | orders to do</title>
 
     <!-- Favicon  -->
     <link rel="icon" href="../../img/core-img/favicon.ico">
@@ -46,7 +45,6 @@ if (isset($_SESSION['id']) === true) {
     <!-- Core Style CSS -->
     <link rel="stylesheet" href="../../css/core-style.css">
     <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 
 <body>
@@ -79,7 +77,6 @@ if (isset($_SESSION['id']) === true) {
             <div>
                 <h3>Welcome,
                     <?php
-                    $session_username = htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8');
                     printf($session_username);
                     ?>
                 </h3>
@@ -91,138 +88,129 @@ if (isset($_SESSION['id']) === true) {
                 <ul>
                     <li><a href="homeadmin.php">home</a></li>
                     <li class="active"><a href="assignwork.php">assign work</a></li>
-                    <li><a href="jobdonebyworkers.php">job done by</br></br>workers</a></li>
+                    <li><a href="jobdonebyworkers.php">orders done by</br></br>workers</a></li>
                     <li><a href="ordersdone.php">orders done</a></li>
-                    <li><a href="orderstodo.php">orders to do</a></li>
                 </ul>
             </nav>
         </header>
-
         <!-- Header Area End -->
         <!-- Product Catagories Area Start -->
         <div class="products-catagories-area clearfix">
-            <div class="amado-pro-catagory clearfix">
 
-                <?php
-                
-                $personnel = array();
-                $i = 0;
+            <?php
 
-                $mysqli = new mysqli('localhost', 'root', '', 'ou_alimel');
+            $personnel = array();
+            $i = 0;
 
-                if ($mysqli->connect_error) {
-                    die('Errore di connessione(' . $mysqli->connect_errno . ')' . $mysqli->connect_error);
+            $mysqli = new mysqli('localhost', 'root', '', 'ou_alimel');
+
+            if ($mysqli->connect_error) {
+                die('Errore di connessione(' . $mysqli->connect_errno . ')' . $mysqli->connect_error);
+            }
+
+
+            try {
+                $tabviaggi = $mysqli->query("SELECT * FROM w_available");
+            } catch (exception $e) {
+                echo $e->getMessage() + "<br/>";
+                echo "Materia not found GO BACK <--";
+            } finally {
+                echo "<div><h2>WORKERS AVAILABLE</h2></div>
+        <table class='customers'>
+        <tr>
+        <th>username</th>
+        <th>name</th>
+        <th>surname</th>
+        <th>state</th>
+        </tr>";
+
+                while ($riga = $tabviaggi->fetch_array(MYSQLI_ASSOC)) {
+
+
+                    echo "<tr>
+                <td>" . $riga['username'] . "</td>
+                <td>" . $riga['name'] . "</td>
+                <td>" . $riga['surname'] . "</td>
+                <td class='available'>available</td>
+                <td class='assignwork'><a href='assignwork_.php?username=${riga['username']}'>assign work</a></td>
+                </tr>";
                 }
+            }
+            echo "</table></br>";
+
+            // -------------------------------------------------END WORKERS AVAILABLE------------------------------------------------------------//
+
+            try {
+                $tabviaggi = $mysqli->query("SELECT * FROM w_not_working");
+            } catch (exception $e) {
+                echo $e->getMessage() + "<br/>";
+                echo "Materia not found GO BACK <--";
+            } finally {
+                echo "<div><h2>WORKERS NOT WORKING</h2></div>
+        <table class='customers'>
+        <tr>
+        <th>username</th>
+        <th>name</th>
+        <th>surname</th>
+        <th>state</th>
+        </tr>";
+                while ($riga = $tabviaggi->fetch_array(MYSQLI_ASSOC)) {
 
 
-                try {
-                    $tabviaggi = $mysqli->query("SELECT * FROM w_available");
-                } catch (exception $e) {
-                    echo $e->getMessage() + "<br/>";
-                    echo "Materia not found GO BACK <--";
-                } finally {
-                    echo "<div><h2>WORKERS AVAILABLE</h2></div>
-                    <table class='customers'>
-                    <tr>
-                    <th>username</th>
-                    <th>name</th>
-                    <th>surname</th>
-                    <th>state</th>
-                    </tr>";
+                    echo "<tr>
+                <td>" . $riga['username'] . "</td>
+                <td>" . $riga['name'] . "</td>
+                <td>" . $riga['surname'] . "</td>
+                <td class='notworking'>not working</td>
+                </tr>";
+                }
+            }
+            echo "</table></br>";
 
-                    while ($riga = $tabviaggi->fetch_array(MYSQLI_ASSOC)) {
+            // -------------------------------------------------END WORKERS NOT WORKING ------------------------------------------------------------//
+
+            try {
+                $tabviaggi = $mysqli->query("SELECT personnel_account.username, personnel_account.name, personnel_account.surname,  personnel_account.working FROM personnel_account ORDER BY personnel_account.username ASC");
+            } catch (exception $e) {
+                echo $e->getMessage() + "<br/>";
+                echo "Materia not found GO BACK <--";
+            } finally {
+                echo "<div><h2>ALL WORKERS</h2></div>
+        <table class='customers'>
+        <tr>
+        <th>username</th>
+        <th>name</th>
+        <th>surname</th>
+        <th>state</th>
+        </tr>";
+                while ($riga2 = $tabviaggi->fetch_array(MYSQLI_ASSOC)) {
 
 
-                            echo "<tr>
-                            <td>" . $riga['username'] . "</td>
-                            <td>" . $riga['name'] . "</td>
-                            <td>" . $riga['surname'] . "</td>
-                            <td class='available'>available</td>
-                            <td class='assignwork'><a href='assignwork_.php?username=${riga['username']}'>assign work</a></td>
-                            </tr>";
-                        
+                    echo "<tr>
+                <td>" . $riga2['username'] . "</td>
+                <td>" . $riga2['name'] . "</td>                       
+                <td>" . $riga2['surname'] . "</td>";
+                    if ($riga2['working'] == 0) {
+                        $statolavoratore = '';
+                        echo "<td class='notworking'>not working</td>";
+                    } elseif ($riga2['working'] == 1) {
+                        $statolavoratore = '';
+                        echo "<td class='available'>available</td>
+                    <td class='assignwork'><a href='assignwork_.php?username=${riga2['username']}'>assign work</a></td>";
+                    } else {
+                        echo "<td class='working'>working...</td>
+                        <td class='assignwork'><a href='assignwork_.php?username=${riga2['username']}'>assign work</a></td>";
                     }
+                    echo "</tr>";
                 }
-                echo "</table></br>";
+            }
+            echo "</table>";
 
-                // -------------------------------------------------END WORKERS AVAILABLE------------------------------------------------------------//
+            // -------------------------------------------------END ALL WORKERS------------------------------------------------------------//
 
-                try {
-                    $tabviaggi = $mysqli->query("SELECT * FROM w_not_working");
-                } catch (exception $e) {
-                    echo $e->getMessage() + "<br/>";
-                    echo "Materia not found GO BACK <--";
-                } finally {
-                    echo "<div><h2>WORKERS NOT WORKING</h2></div>
-                    <table class='customers'>
-                    <tr>
-                    <th>username</th>
-                    <th>name</th>
-                    <th>surname</th>
-                    <th>state</th>
-                    </tr>";
-                    while ($riga = $tabviaggi->fetch_array(MYSQLI_ASSOC)) {
+            ?>
+            </br></br></br>
 
-
-                            echo"<tr>
-                            <td>" . $riga['username'] . "</td>
-                            <td>" . $riga['name'] . "</td>
-                            <td>" . $riga['surname'] . "</td>
-                            <td class='notworking'>not working</td>
-                            </tr>";
-                        }
-                    
-                }
-                echo "</table></br>";
-
-                // -------------------------------------------------END WORKERS NOT WORKING ------------------------------------------------------------//
-
-
-
-
-                try {
-                    $tabviaggi = $mysqli->query("SELECT personnel_account.username, personnel_account.name, personnel_account.surname,  personnel_account.working FROM personnel_account ORDER BY personnel_account.username ASC");
-                } catch (exception $e) {
-                    echo $e->getMessage() + "<br/>";
-                    echo "Materia not found GO BACK <--";
-                } finally {
-                    echo "<div><h2>ALL WORKERS</h2></div>
-                    <table class='customers'>
-                    <tr>
-                    <th>username</th>
-                    <th>name</th>
-                    <th>surname</th>
-                    <th>state</th>
-                    </tr>";
-                    while ($riga2 = $tabviaggi->fetch_array(MYSQLI_ASSOC)) {
-
-
-                            echo"<tr>
-                            <td>" . $riga2['username'] . "</td>
-                            <td>" . $riga2['name'] . "</td>                       
-                            <td>" . $riga2['surname'] . "</td>";
-                            if ($riga2['working'] == 0) {
-                                $statolavoratore = '';
-                                echo "<td class='notworking'>not working</td>";
-                            } elseif ($riga2['working'] == 1) {
-                                $statolavoratore = '';
-                                echo "<td class='available'>available</td>
-                                <td class='assignwork'><a href='assignwork_.php?username=${riga2['username']}'>assign work</a></td>";
-                            } else {
-                                echo "<td class='working'>working...</td>";
-                            }
-                            echo "</tr>";
-                        
-                    }
-                }
-                echo "</table>";
-
-                // -------------------------------------------------END ALL WORKERS------------------------------------------------------------//
-
-                ?>
-                </br></br></br>
-
-            </div>
         </div>
         <!-- Product Catagories Area End -->
     </div>
@@ -241,7 +229,6 @@ if (isset($_SESSION['id']) === true) {
             </div>
         </div>
     </section>
-    
     <!-- ##### Newsletter Area End ##### -->
 
     <!-- ##### Footer Area Start ##### -->
@@ -276,10 +263,10 @@ if (isset($_SESSION['id']) === true) {
                                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#footerNavContent" aria-controls="footerNavContent" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i></button>
                                 <div class="collapse navbar-collapse" id="footerNavContent">
                                     <ul class="navbar-nav ml-auto">
-                                        <li class="nav-item active">
+                                        <li class="nav-item">
                                             <a class="nav-link" href="homeadmin.php">Home</a>
                                         </li>
-                                        <li class="nav-item">
+                                        <li class="nav-item active">
                                             <a class="nav-link" href="assignwork.php">assign work</a>
                                         </li>
                                         <li class="nav-item">
@@ -287,9 +274,6 @@ if (isset($_SESSION['id']) === true) {
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" href="ordersdone.php">orders done</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="orderstodo.php">orders to do</a>
                                         </li>
                                     </ul>
                                 </div>

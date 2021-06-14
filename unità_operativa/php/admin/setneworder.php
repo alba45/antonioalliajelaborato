@@ -12,7 +12,7 @@ if (isset($_POST['register'])) {
 
     if ($n_articles > 3 & $category = 1) {
         $category = 2;
-    } elseif ($n_articles <= 3 & $category = 2 ) {
+    } elseif ($n_articles <= 3 & $category = 2) {
         $category = 1;
     } elseif ($n_articles > 1 & $category = 3 || $category = 4) {
         $category = 5;

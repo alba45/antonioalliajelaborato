@@ -9,7 +9,7 @@ if (isset($_SESSION['id']) === true) {
 
     $query = "
             SELECT username
-            FROM admin_account
+            FROM personnel_account
             WHERE username = :username";
 
     $check = $pdo->prepare($query);
@@ -37,7 +37,7 @@ if (isset($_SESSION['id']) === true) {
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <!-- Title  -->
-    <title>AliMel.it | job done by workers</title>
+    <title>AliMel.it | orders done</title>
 
     <!-- Favicon  -->
     <link rel="icon" href="../../img/core-img/favicon.ico">
@@ -86,42 +86,73 @@ if (isset($_SESSION['id']) === true) {
             </div>
             <nav class="amado-nav">
                 <ul>
-                    <li><a href="homeadmin.php">home</a></li>
-                    <li><a href="assignwork.php">assign work</a></li>
-                    <li class="active"><a href="jobdonebyworkers.php">orders done by</br></br>workers</a></li>
-                    <li><a href="ordersdone.php">orders done</a></li>
+                    <li><a href="homeworker.php">orders to do</a></li>
+                    <li class="active"><a href="ordersdone.php">orders done</a></li>
                 </ul>
             </nav>
         </header>
         <!-- Header Area End -->
-        <div class="cart-table-area section-padding-100">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-12 col-lg-8">
-                        <div class="checkout_details_area mt-50 clearfix">
+        <!-- Product Catagories Area Start -->
+        <div class="products-catagories-area clearfix">
 
-                            <div class="cart-title">
-                                <h2>Search jobs done by the username</h2>
-                                <h5>Insert the the username of the employer to see his orders done</h5>
-                            </div>
+            <?php
+            $category = array('', 'base', 'compound', 'fragile', 'heavy', 'extraordinary');
+            $date = date('Y/m/d');
+            $codO = array();
+            $i = 0;
 
-                            <form method="POST" action="jobofaworker.php">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <input type="text" class="form-control" id="username" name="username" placeholder="Name" required>
-                                    </div>
-                                    <div class="col-12 mb-3">
-                                        <div class="cart-btn mt-100">
-                                            <button type="submit" class="btn amado-btn mb-15" name="assign orders">Search orders</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            $mysqli = new mysqli('localhost', 'root', '', 'ou_alimel');
+
+            if ($mysqli->connect_error) {
+                die('Errore di connessione(' . $mysqli->connect_errno . ')' . $mysqli->connect_error);
+            }
+
+            try {
+                $tab = $mysqli->query("SELECT orders.codO,n_articles, codC, codWS
+                    FROM orders
+                    WHERE orders.usernameP='$session_username'
+                    AND orders.codWS IS NOT NULL");
+            } catch (exception $e) {
+                echo $e->getMessage() + "<br/>
+                        something went wrong GO BACK <--";
+            } finally {
+
+                echo "<div><h2>ALL ORDERS DONE</h2></div>
+                        <table class='customers'>
+                        <tr>
+                        <th>codO</th>
+                        <th>articles</th>
+                        <th>category</th>
+                        <th>warehouse</th>
+                        </tr>";
+
+                if (mysqli_num_rows($tab) != 0) {
+                    while ($riga = $tab->fetch_array(MYSQLI_ASSOC)) {
+
+                        echo "<tr>
+                            <td>" . $riga['codO'] . "</td>                        
+                            <td>" . $riga['n_articles'] . "</td>                        
+                            <td>" . $category[$riga['codC']] . "</td>
+                            <td>" . $riga['codWS'] . "</td>   
+                            </tr>";
+                    }
+                    echo "</table></br>";
+                    $tab = $mysqli->query("SELECT COUNT(orders.codO) AS conteggio
+                    FROM orders
+                    WHERE orders.usernameP='$session_username'
+                    AND orders.codWS IS NOT NULL");
+                    $riga = $tab->fetch_array(MYSQLI_ASSOC);
+                    echo "<h4>orders done:" . $riga['conteggio'] . "</h4></br></br>";
+                } else {
+                    echo "</table></br></br></br><h5>no order made</h5></br></br>";
+                }
+            }
+            // -------------------------------------------------END ALL ORDERS ------------------------------------------------------------//
+
+            ?>
+
         </div>
+        <!-- Product Catagories Area End -->
     </div>
     <!-- ##### Main Content Wrapper End ##### -->
 
@@ -173,16 +204,11 @@ if (isset($_SESSION['id']) === true) {
                                 <div class="collapse navbar-collapse" id="footerNavContent">
                                     <ul class="navbar-nav ml-auto">
                                         <li class="nav-item">
-                                            <a class="nav-link" href="homeadmin.php">Home</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="assignwork.php">assign work</a>
+                                            <a class="nav-link" href="homeworker.php">orders to do</a>
                                         </li>
                                         <li class="nav-item active">
-                                            <a class="nav-link" href="jobdonebyworkers.php">orders done by workers</a>
-                                        </li>
-                                        <li class="nav-item">
                                             <a class="nav-link" href="ordersdone.php">orders done</a>
+                                        </li>
                                         </li>
                                     </ul>
                                 </div>

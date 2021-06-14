@@ -37,7 +37,7 @@ if (isset($_SESSION['id']) === true) {
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <!-- Title  -->
-    <title>AliMel.it | order to do</title>
+    <title>AliMel.it | orders to do</title>
 
     <!-- Favicon  -->
     <link rel="icon" href="../../img/core-img/favicon.ico">
@@ -45,7 +45,6 @@ if (isset($_SESSION['id']) === true) {
     <!-- Core Style CSS -->
     <link rel="stylesheet" href="../../css/core-style.css">
     <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 
 <body>
@@ -78,7 +77,6 @@ if (isset($_SESSION['id']) === true) {
             <div>
                 <h3>Welcome,
                     <?php
-                    $session_username = htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8');
                     printf($session_username);
                     ?>
                 </h3>
@@ -90,42 +88,39 @@ if (isset($_SESSION['id']) === true) {
                 <ul>
                     <li><a href="homeadmin.php">home</a></li>
                     <li><a href="assignwork.php">assign work</a></li>
-                    <li><a href="jobdonebyworkers.php">job done by</br></br>workers</a></li>
+                    <li><a href="jobdonebyworkers.php">orders done by</br></br>workers</a></li>
                     <li><a href="ordersdone.php">orders done</a></li>
-                    <li class="active"><a href="orderstodo.php">orders to do</a></li>
                 </ul>
             </nav>
         </header>
         <!-- Header Area End -->
         <!-- Product Catagories Area Start -->
         <div class="products-catagories-area clearfix">
-            <div class="amado-pro-catagory clearfix">
-                <form method="POST" action="assignwork.php">
-                    <?php
-                    $category = array('', 'base', 'compound', 'fragile', 'heavy', 'extraordinary',);
-                    $date = date('Y/m/d');
-                    $codO = array();
-                    $i = 0;
 
-                    $mysqli = new mysqli('localhost', 'root', '', 'ou_alimel');
+            <?php
+            $category = array('', 'base', 'compound', 'fragile', 'heavy', 'extraordinary',);
+            $date = date('Y/m/d');
+            $codO = array();
+            $i = 0;
 
-                    if ($mysqli->connect_error) {
-                        die('Errore di connessione(' . $mysqli->connect_errno . ')' . $mysqli->connect_error);
-                    }
+            $mysqli = new mysqli('localhost', 'root', '', 'ou_alimel');
 
+            if ($mysqli->connect_error) {
+                die('Errore di connessione(' . $mysqli->connect_errno . ')' . $mysqli->connect_error);
+            }
 
-                    try {
-                        $tab = $mysqli->query("SELECT orders.codO,n_articles, codC
+            try {
+                $tab0 = $mysqli->query("SELECT orders.codO,n_articles, codC
                     FROM orders
                     WHERE orders.date_order < '$date' 
                     AND orders.usernameP IS NULL 
                     AND orders.codWS IS NULL");
-                    } catch (exception $e) {
-                        echo $e->getMessage() + "<br/>
+            } catch (exception $e) {
+                echo $e->getMessage() + "<br/>
                          something went wrong GO BACK <--";
-                    } finally {
+            } finally {
 
-                        echo "<div><h2>ORDINI DA FARE PRIORITARI</h2></div>
+                echo "<div><h2>ORDERS WITH PRIORITY</h2></div>
                         <table class='customers'>
                         <tr>
                         <th>codO</th>
@@ -133,35 +128,42 @@ if (isset($_SESSION['id']) === true) {
                         <th>category</th>
                         </tr>";
 
-                        if (mysqli_num_rows($tab) != 0) {
-                            while ($riga = $tab->fetch_array(MYSQLI_ASSOC)) {
+                if (mysqli_num_rows($tab0) != 0) {
+                    while ($riga0 = $tab0->fetch_array(MYSQLI_ASSOC)) {
 
-                                echo "<tr>
-                            <td>" . $riga['codO'] . "</td>                        
-                            <td>" . $riga['n_articles'] . "</td>                        
-                            <td>" . $category[$riga['codC']] . "</td>
+                        echo "<tr>
+                            <td>" . $riga0['codO'] . "</td>                        
+                            <td>" . $riga0['n_articles'] . "</td>
+                            <td>" . $category[$riga0['codC']] . "</td>
                             </tr>";
-                            }
-                            echo "</table></br>";
-                        } else {
-                            echo "</table></br><h4><nessun ordine oggi</h4></br></br>";
-                        }
                     }
+                    echo "</table></br>";
+                    $tab = $mysqli->query("SELECT COUNT(orders.codO) AS conteggio
+                    FROM orders
+                    WHERE orders.date_order < '$date' 
+                    AND orders.usernameP IS NULL 
+                    AND orders.codWS IS NULL");
+                $riga = $tab->fetch_array(MYSQLI_ASSOC);
+                echo "<h4>orders to do:" . $riga['conteggio'] . "</h4></br></br>";
+                } else {
+                    echo "</table><h5>no priority orders</h5></br></br>";
+                }
+            }
 
-                    // -------------------------------------------------END ORDERS AVAILABLE OF TODAY------------------------------------------------------------//
+            // -------------------------------------------------END ORDERS AVAILABLE OF TODAY------------------------------------------------------------//
 
-                    try {
-                        $tab = $mysqli->query("SELECT orders.codO,n_articles, codC
+            try {
+                $tab1 = $mysqli->query("SELECT orders.codO,n_articles, codC
                     FROM orders
                     WHERE orders.date_order = '$date' 
                     AND orders.usernameP IS NULL 
                     AND orders.codWS IS NULL");
-                    } catch (exception $e) {
-                        echo $e->getMessage() + "<br/>
+            } catch (exception $e) {
+                echo $e->getMessage() + "<br/>
                         something went wrong GO BACK <--";
-                    } finally {
+            } finally {
 
-                        echo "<div><h2>ORDINI DI OGGI DA FARE</h2></div>
+                echo "<div><h2>TODAY'S ORDERS</h2></div>
                         <table class='customers'>
                         <tr>
                         <th>codO</th>
@@ -169,67 +171,71 @@ if (isset($_SESSION['id']) === true) {
                         <th>category</th>
                         </tr>";
 
-                        if (mysqli_num_rows($tab) != 0) {
-                            while ($riga = $tab->fetch_array(MYSQLI_ASSOC)) {
+                if (mysqli_num_rows($tab1) != 0) {
+                    while ($riga1 = $tab1->fetch_array(MYSQLI_ASSOC)) {
 
-                                echo "<tr>
-                            <td>" . $riga['codO'] . "</td>                        
-                            <td>" . $riga['n_articles'] . "</td>                        
-                            <td>" . $category[$riga['codC']] . "</td>";
-                                echo "</tr>";
-                            }
-                            echo "</table></br>";
-                        } else {
-                            echo "</table></br><h4><nessun ordine oggi</h4></br></br>";
-                        }
-                    }
-
-                    // -------------------------------------------------END TODAY'S ORDERS ------------------------------------------------------------//
-
-                    try {
-                        $tab = $mysqli->query("SELECT * FROM orders 
-                    WHERE orders.usernameP IS NULL 
-                    AND orders.codWS IS NULL 
-                    ORDER BY orders.date_order ASC");
-                    } catch (exception $e) {
-                        echo $e->getMessage() + "<br/>
-                        something went wrong GO BACK <--";
-                    } finally {
-                        echo "<div><h2>ALL ORDERS TO DO</h2></div>
-                        <table class='customers'>
-                        <tr>
-                        <th>codO</th>
-                        <th>articles</th>
-                        <th>category</th>
-                        </tr>";
-
-                        if (mysqli_num_rows($tab) != 0) {
-                            while ($riga = $tab->fetch_array(MYSQLI_ASSOC)) {
-
-                                echo "<tr>
-                            <td>" . $riga['codO'] . "</td>                        
-                            <td>" . $riga['n_articles'] . "</td>                        
-                            <td>" . $category[$riga['codC']] . "</td>
-                            <td><input type='checkbox' value='${riga['codO']}'></td>
+                        echo "<tr>
+                            <td>" . $riga1['codO'] . "</td>                        
+                            <td>" . $riga1['n_articles'] . "</td>                        
+                            <td>" . $category[$riga1['codC']] . "</td>
                             </tr>";
-                            }
-                            echo "</table></br>";
-                        } else {
-                            echo "</table></br><h4><nessun ordine disponibile</h4></br></br>";
-                        }
                     }
-                    // -------------------------------------------------END ALL ORDERS ------------------------------------------------------------//
+                    echo "</table></br>";
+                    $tab = $mysqli->query("SELECT COUNT(orders.codO) AS conteggio
+                    FROM orders
+                    WHERE orders.date_order = '$date' 
+                    AND orders.usernameP IS NULL 
+                    AND orders.codWS IS NULL");
+                $riga = $tab->fetch_array(MYSQLI_ASSOC);
+                echo "<h4>orders to do:" . $riga['conteggio'] . "</h4></br></br>";
+                } else {
+                    echo "</table><h5>no orders today</h5></br></br>";
+                }
+            }
 
-                    ?>
-                    <div class="col-12 mb-3">
-                        <div class="cart-btn mt-100">
-                            <button type="submit" class="btn amado-btn mb-15" name="assign orders">Assign orders</button>
-                        </div>
-                    </div>
-                </form>
-                </br></br></br>
+            // -------------------------------------------------END TODAY'S ORDERS ------------------------------------------------------------//
 
-            </div>
+            try {
+                $tab2 = $mysqli->query("SELECT * FROM orders 
+                    WHERE orders.usernameP IS NULL 
+                    AND orders.codWS IS NULL");
+            } catch (exception $e) {
+                echo $e->getMessage() + "<br/>
+                        something went wrong GO BACK <--";
+            } finally {
+
+                echo "<div><h2>ALL ORDERS TO DO</h2></div>
+                        <table class='customers'>
+                        <tr>
+                        <th>codO</th>
+                        <th>articles</th>
+                        <th>category</th>
+                        </tr>";
+
+                if (mysqli_num_rows($tab2) != 0) {
+                    while ($riga2 = $tab2->fetch_array(MYSQLI_ASSOC)) {
+
+                        echo "<tr>
+                            <td>" . $riga2['codO'] . "</td>                        
+                            <td>" . $riga2['n_articles'] . "</td>                        
+                            <td>" . $category[$riga2['codC']] . "</td>
+                            </tr>";
+                    }
+                    echo "</table></br>";
+                    $tab = $mysqli->query("SELECT COUNT(orders.codO) AS conteggio
+                    FROM orders
+                    WHERE orders.usernameP IS NULL 
+                    AND orders.codWS IS NULL ");
+                $riga = $tab->fetch_array(MYSQLI_ASSOC);
+                echo "<h4>orders to do:" . $riga['conteggio'] . "</h4></br></br>";
+                } else {
+                    echo "</table><h5>nessun ordine oggi</h5></br></br>";
+                }
+            }
+            // -------------------------------------------------END ALL ORDERS ------------------------------------------------------------//
+
+            ?>
+
         </div>
         <!-- Product Catagories Area End -->
     </div>
@@ -282,7 +288,7 @@ if (isset($_SESSION['id']) === true) {
                                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#footerNavContent" aria-controls="footerNavContent" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i></button>
                                 <div class="collapse navbar-collapse" id="footerNavContent">
                                     <ul class="navbar-nav ml-auto">
-                                        <li class="nav-item active">
+                                        <li class="nav-item">
                                             <a class="nav-link" href="homeadmin.php">Home</a>
                                         </li>
                                         <li class="nav-item">
@@ -293,9 +299,6 @@ if (isset($_SESSION['id']) === true) {
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" href="ordersdone.php">orders done</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="orderstodo.php">orders to do</a>
                                         </li>
                                     </ul>
                                 </div>

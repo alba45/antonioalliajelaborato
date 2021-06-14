@@ -19,11 +19,10 @@ if (isset($_SESSION['id']) === true) {
     $usernamecheck = $check->fetchAll(PDO::FETCH_ASSOC);
 
     if (count($usernamecheck) > 0) {
-    }else{
+    } else {
         header("Location: ../../index.html");
     }
-
-}else{
+} else {
     header("Location: ../../index.html");
 }
 ?>
@@ -89,9 +88,8 @@ if (isset($_SESSION['id']) === true) {
                 <ul>
                     <li><a href="homeadmin.php">home</a></li>
                     <li><a href="assignwork.php">assign work</a></li>
-                    <li><a href="jobdonebyworkers.php">job done by</br></br>workers</a></li>
+                    <li><a href="jobdonebyworkers.php">orders done by</br></br>workers</a></li>
                     <li><a href="ordersdone.php">orders done</a></li>
-                    <li><a href="orderstodo.php">orders to do</a></li>
                 </ul>
             </nav>
         </header>
@@ -188,22 +186,18 @@ if (isset($_SESSION['id']) === true) {
                                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#footerNavContent" aria-controls="footerNavContent" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i></button>
                                 <div class="collapse navbar-collapse" id="footerNavContent">
                                     <ul class="navbar-nav ml-auto">
-                                        <li class="nav-item active">
+                                        <li class="nav-item">
                                             <a class="nav-link" href="homeadmin.php">Home</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" href="assignwork.php">assign work</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" href="jobdonebyworkers.php">job done by workers</a>
+                                            <a class="nav-link" href="jobdonebyworkers.php">orders done by workers</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" href="ordersdone.php">orders done</a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="orderstodo.php">orders to do</a>
-                                        </li>
-                                    </ul>
                                 </div>
                             </nav>
                         </div>

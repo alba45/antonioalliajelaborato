@@ -8,5 +8,5 @@ if (isset($_SESSION['id'])) {
 
 session_destroy();
 
-header('Location: ../../index.html');
+header('Location: ../../indexadmin.html');
 exit;

@@ -9,7 +9,7 @@ if (isset($_SESSION['id']) === true) {
 
     $query = "
             SELECT username
-            FROM admin_account
+            FROM personnel_account
             WHERE username = :username";
 
     $check = $pdo->prepare($query);
@@ -19,6 +19,14 @@ if (isset($_SESSION['id']) === true) {
     $usernamecheck = $check->fetchAll(PDO::FETCH_ASSOC);
 
     if (count($usernamecheck) > 0) {
+        $query = "
+    UPDATE `personnel_account` SET `working` = '2'
+    WHERE `personnel_account`.`username` = :username;
+    ";
+
+        $check = $pdo->prepare($query);
+        $check->bindParam(':username', $session_username, PDO::PARAM_STR);
+        $check->execute();
     } else {
         header("Location: ../../index.html");
     }
@@ -37,7 +45,7 @@ if (isset($_SESSION['id']) === true) {
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <!-- Title  -->
-    <title>AliMel.it | job done by workers</title>
+    <title>AliMel.it | home worker: orders to do</title>
 
     <!-- Favicon  -->
     <link rel="icon" href="../../img/core-img/favicon.ico">
@@ -86,42 +94,84 @@ if (isset($_SESSION['id']) === true) {
             </div>
             <nav class="amado-nav">
                 <ul>
-                    <li><a href="homeadmin.php">home</a></li>
-                    <li><a href="assignwork.php">assign work</a></li>
-                    <li class="active"><a href="jobdonebyworkers.php">orders done by</br></br>workers</a></li>
-                    <li><a href="ordersdone.php">orders done</a></li>
+                    <li><a href="homeworker.php">orders to do</a></li>
+                    <li class="active"><a href="ordersdone.php">orders done</a></li>
                 </ul>
             </nav>
         </header>
         <!-- Header Area End -->
-        <div class="cart-table-area section-padding-100">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-12 col-lg-8">
-                        <div class="checkout_details_area mt-50 clearfix">
+        <!-- Product Catagories Area Start -->
+        <div class="products-catagories-area clearfix">
 
-                            <div class="cart-title">
-                                <h2>Search jobs done by the username</h2>
-                                <h5>Insert the the username of the employer to see his orders done</h5>
-                            </div>
+            <?php
+            $codO = $_GET['codO'] ?? '';
+            $category = array('', 'base', 'compound', 'fragile', 'heavy', 'extraordinary',);
+            echo "<h2>Working on order n° $codO</h2>";
 
-                            <form method="POST" action="jobofaworker.php">
+            $mysqli = new mysqli('localhost', 'root', '', 'ou_alimel');
+
+            if ($mysqli->connect_error) {
+                die('Errore di connessione(' . $mysqli->connect_errno . ')' . $mysqli->connect_error);
+            }
+
+            try {
+                $tab = $mysqli->query("SELECT n_articles, codC
+                                    FROM orders
+                                    WHERE orders.codO=$codO");
+            } catch (exception $e) {
+                echo $e->getMessage() + "<br/>
+                                    something went wrong GO BACK <--";
+            } finally {
+                $riga = $tab->fetch_array(MYSQLI_ASSOC);
+                $n_articles = $riga['n_articles'];
+                echo "
+                <table class='customers'>
+                <tr>
+                <th>articles</th>
+                <th>category</th>
+                </tr>
+                <tr>                   
+                <td>" . $n_articles . "</td>
+                <td>" . $category[$riga['codC']] . "</td>
+                </tr>
+                </table>
+                </br>";
+                $tab = $mysqli->query("SELECT time_to_prepare, time_expedition
+                FROM orders,category
+                WHERE orders.codO=$codO
+                AND orders.codC=category.codC");
+                $riga = $tab->fetch_array(MYSQLI_ASSOC);
+                $time_to_prepare = $riga['time_to_prepare'] * $n_articles;
+                $time_expedition = $riga['time_expedition'];
+                echo "<h4>You have to take approximately: $time_to_prepare minutes to finish the order.</h4></br></br>";
+            }
+            ?>
+            <div class="cart-table-area section-padding-100">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12 col-lg-8">
+                            <div class="checkout_details_area mt-50 clearfix">
+                                <?php
+                                echo " <form action='orderdone.php?codO=$codO' method='post'>";
+                                ?>
                                 <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <input type="text" class="form-control" id="username" name="username" placeholder="Name" required>
-                                    </div>
-                                    <div class="col-12 mb-3">
-                                        <div class="cart-btn mt-100">
-                                            <button type="submit" class="btn amado-btn mb-15" name="assign orders">Search orders</button>
-                                        </div>
-                                    </div>
+                                    <h5>Insert the number of the wharehouse where you stored the order.</h5>
+                                    <input type="number" class="form-control" id="codWS" name="codWS" min="0" placeholder="Wharehouse n°" required>
+                                    <?php echo "<h4>It will take approximately $time_expedition days to arrive to the destination.</h4></br></br>";
+                                    ?>
                                 </div>
-                            </form>
+                                <button type="submit" class="btn amado-btn mb-15" name="register">order completed</button></br></br>
+                                </form>
+                                <a>Do you want to work on another order? Click down below.</a></br></br>
+                                <a href="homeworker.php" class="btn amado-btn mb-15">another order</a>
+
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- Product Catagories Area End -->
     </div>
     <!-- ##### Main Content Wrapper End ##### -->
 
@@ -173,16 +223,11 @@ if (isset($_SESSION['id']) === true) {
                                 <div class="collapse navbar-collapse" id="footerNavContent">
                                     <ul class="navbar-nav ml-auto">
                                         <li class="nav-item">
-                                            <a class="nav-link" href="homeadmin.php">Home</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="assignwork.php">assign work</a>
-                                        </li>
-                                        <li class="nav-item active">
-                                            <a class="nav-link" href="jobdonebyworkers.php">orders done by workers</a>
+                                            <a class="nav-link" href="homeworker.php">orders to do</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" href="ordersdone.php">orders done</a>
+                                        </li>
                                         </li>
                                     </ul>
                                 </div>

@@ -6,6 +6,7 @@ session_start();
 if (isset($_SESSION['id']) === true) {
 
     $session_username = htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8');
+
     $query = "
             SELECT username
             FROM personnel_account
@@ -19,10 +20,10 @@ if (isset($_SESSION['id']) === true) {
 
     if (count($usernamecheck) > 0) {
     } else {
-        header("Location: ../../indexadmin.html");
+        header("Location: ../../index.html");
     }
 } else {
-    header("Location: ../../indexadmin.html");
+    header("Location: ../../index.html");
 }
 ?>
 <!DOCTYPE html>
@@ -44,30 +45,9 @@ if (isset($_SESSION['id']) === true) {
     <!-- Core Style CSS -->
     <link rel="stylesheet" href="../../css/core-style.css">
     <link rel="stylesheet" href="../../css/style.css">
-
 </head>
 
 <body>
-    <!-- Search Wrapper Area Start -->
-    <div class="search-wrapper section-padding-100">
-        <div class="search-close">
-            <i class="fa fa-close" aria-hidden="true"></i>
-        </div>
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="search-content">
-                        <form action="#" method="get">
-                            <input type="search" name="search" id="search" placeholder="Type your keyword...">
-                            <button type="submit"><img src="../../img/core-img/search.png" alt=""></button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Search Wrapper Area End -->
-
     <!-- ##### Main Content Wrapper Start ##### -->
     <div class="main-content-wrapper d-flex clearfix">
 
@@ -97,7 +77,6 @@ if (isset($_SESSION['id']) === true) {
             <div>
                 <h3>Welcome,
                     <?php
-                    $session_username = htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8');
                     printf($session_username);
                     ?>
                 </h3>
@@ -107,22 +86,116 @@ if (isset($_SESSION['id']) === true) {
             </div>
             <nav class="amado-nav">
                 <ul>
-                    <li class="active"><a href="homeworker.php">home</a></li>
-                    <li><a href="oredertodo.php">ordini fatti</a></li>
+                    <li class="active"><a href="homeworker.php">orders to do</a></li>
+                    <li><a href="ordersdone.php">orders done</a></li>
                 </ul>
             </nav>
         </header>
         <!-- Header Area End -->
         <!-- Product Catagories Area Start -->
         <div class="products-catagories-area clearfix">
-            <div class="amado-pro-catagory clearfix">
 
-                <!-- Single Catagory -->
-                <div class="single-products-catagory clearfix">
+            <?php
+            $category = array('', 'base', 'compound', 'fragile', 'heavy', 'extraordinary',);
+            $date = date('Y/m/d');
+            $codO = array();
+            $i = 0;
 
-                </div>
-            </div>
+            $mysqli = new mysqli('localhost', 'root', '', 'ou_alimel');
+
+            if ($mysqli->connect_error) {
+                die('Errore di connessione(' . $mysqli->connect_errno . ')' . $mysqli->connect_error);
+            }
+
+            try {
+                $tab = $mysqli->query("SELECT orders.codO,n_articles, codC
+                    FROM orders
+                    WHERE orders.usernameP='$session_username'
+                    AND orders.date_order < '$date'
+                    AND orders.codWS IS NULL");
+            } catch (exception $e) {
+                echo $e->getMessage() + "<br/>
+                         something went wrong GO BACK <--";
+            } finally {
+                if (mysqli_num_rows($tab) != 0) {
+                    echo "<div><h2>PRIORITY</h2></div>
+                        <table class='customers'>
+                        <tr>
+                        <th>codO</th>
+                        <th>articles</th>
+                        <th>category</th>
+                        </tr>";
+
+
+                    while ($riga = $tab->fetch_array(MYSQLI_ASSOC)) {
+
+                        echo "<tr>
+                            <td>" . $riga['codO'] . "</td>                        
+                            <td>" . $riga['n_articles'] . "</td>
+                            <td>" . $category[$riga['codC']] . "</td>
+                            <td class='assignwork'><a href='takeorder.php?codO=${riga['codO']}'>take order</a></td>
+                            </tr>";
+                    }
+                    echo "</table></br>";
+                    $tab = $mysqli->query("SELECT COUNT(orders.codO) AS conteggio
+                    FROM orders
+                    WHERE orders.usernameP='$session_username'
+                    AND orders.date_order < '$date'
+                    AND orders.codWS IS NULL");
+                    $riga = $tab->fetch_array(MYSQLI_ASSOC);
+                    echo "<h4>priority orders to do:" . $riga['conteggio'] . "</h4></br></br>";
+                }
+            }
+
+            // -------------------------------------------------END ORDERS AVAILABLE OF TODAY------------------------------------------------------------//
+
+            try {
+                $tab = $mysqli->query("SELECT orders.codO,n_articles, codC
+                    FROM orders
+                    WHERE orders.usernameP='$session_username'
+                    AND orders.codWS IS NULL
+                    ORDER BY orders.codO ASC");
+            } catch (exception $e) {
+                echo $e->getMessage() + "<br/>
+                        something went wrong GO BACK <--";
+            } finally {
+
+                echo "<div><h2>ALL ORDERS TO DO</h2></div>
+                        <table class='customers'>
+                        <tr>
+                        <th>codO</th>
+                        <th>articles</th>
+                        <th>category</th>
+                        </tr>";
+
+                if (mysqli_num_rows($tab) != 0) {
+                    while ($riga = $tab->fetch_array(MYSQLI_ASSOC)) {
+
+                        echo "<tr>
+                            <td>" . $riga['codO'] . "</td>                        
+                            <td>" . $riga['n_articles'] . "</td>                        
+                            <td>" . $category[$riga['codC']] . "</td>
+                            <td class='assignwork'><a href='takeorder.php?codO=${riga['codO']}'>take order</a></td>
+                            </tr>";
+                    }
+                    echo "</table></br>";
+                    $tab = $mysqli->query("SELECT COUNT(orders.codO) AS conteggio
+                    FROM orders
+                    WHERE orders.usernameP='$session_username'
+                    AND orders.codWS IS NULL
+                    ORDER BY orders.codO ASC");
+                    $riga = $tab->fetch_array(MYSQLI_ASSOC);
+                    echo "<h4>orders to do:" . $riga['conteggio'] . "</h4></br></br>";
+                } else {
+                    echo "</table><h5>no order</h5></br></br>";
+                }
+            }
+            // -------------------------------------------------END ALL ORDERS ------------------------------------------------------------//
+
+            ?>
+
         </div>
+        <!-- Product Catagories Area End -->
     </div>
     <!-- ##### Main Content Wrapper End ##### -->
 
@@ -134,7 +207,7 @@ if (isset($_SESSION['id']) === true) {
                 <div class="newsletter-text mb-100">
                     <h2><span>AliMel the company created by you</span></h2>
                     <p>We need to thank everyone that work in our company.
-                        Your work is what made this company big and will make it even bigger.</p>
+                        Your work is what made this company big and we will make it even bigger.</p>
                 </div>
             </div>
         </div>
@@ -174,10 +247,11 @@ if (isset($_SESSION['id']) === true) {
                                 <div class="collapse navbar-collapse" id="footerNavContent">
                                     <ul class="navbar-nav ml-auto">
                                         <li class="nav-item active">
-                                            <a class="nav-link" href="homeworker.php">Home</a>
+                                            <a class="nav-link" href="homeworker.php">orders to do</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" href="shoplogged.html">orders done</a>
+                                            <a class="nav-link" href="ordersdone.php">orders done</a>
+                                        </li>
                                         </li>
                                     </ul>
                                 </div>
